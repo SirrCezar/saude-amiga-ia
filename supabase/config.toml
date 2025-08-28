@@ -1,1 +1,4 @@
 project_id = "xvfbssrejzvjioexykuj"
+
+[functions.health-api]
+verify_jwt = true
