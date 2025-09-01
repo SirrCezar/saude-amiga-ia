@@ -34,7 +34,7 @@ const Settings = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const savedWebhook = localStorage.getItem('n8n_webhook_url');
+    const savedWebhook = localStorage.getItem('chatbot_webhook_url');
     if (savedWebhook) {
       setWebhookUrl(savedWebhook);
     }
@@ -44,10 +44,10 @@ const Settings = () => {
     setIsSaving(true);
     try {
       // Aqui futuramente pode salvar no backend via Supabase
-      localStorage.setItem('n8n_webhook_url', webhookUrl);
+      localStorage.setItem('chatbot_webhook_url', webhookUrl);
       toast({
         title: "Configuração Salva",
-        description: "URL do webhook N8N foi salva com sucesso.",
+        description: "URL do webhook foi salva com sucesso.",
       });
     } catch (error) {
       toast({
@@ -371,12 +371,12 @@ const Settings = () => {
           {/* Integrations Tab */}
           <TabsContent value="integrations">
             <div className="grid lg:grid-cols-1 gap-6">
-              {/* N8N Chatbot Configuration */}
+              {/* Webhook Chatbot Configuration */}
               <Card className="shadow-card">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Zap className="h-5 w-5 text-primary" />
-                    <span>Configuração do Chatbot N8N</span>
+                    <span>Configuração do Webhook do Chatbot</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -387,7 +387,7 @@ const Settings = () => {
                         <div>
                           <h4 className="font-medium text-foreground mb-1">Webhook do Chatbot</h4>
                           <p className="text-sm text-muted-foreground">
-                            Configure o endpoint do N8N que receberá as mensagens do chatbot e retornará as respostas.
+                            Configure o endpoint que receberá as mensagens do chatbot e retornará as respostas automatizadas.
                           </p>
                         </div>
                       </div>
@@ -395,18 +395,18 @@ const Settings = () => {
 
                     <div className="space-y-3">
                       <Label htmlFor="webhook-url" className="text-sm font-medium">
-                        URL do Webhook N8N
+                        URL do Webhook
                       </Label>
                       <Input
                         id="webhook-url"
                         type="url"
-                        placeholder="https://seu-n8n-instance.com/webhook/chatbot"
+                        placeholder="https://seu-webhook-endpoint.com/api/chatbot"
                         value={webhookUrl}
                         onChange={(e) => setWebhookUrl(e.target.value)}
                         className="w-full"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Esta URL será usada para enviar mensagens do chat e receber respostas automatizadas.
+                        Esta URL será usada para enviar mensagens do chat e receber respostas do seu sistema de IA.
                       </p>
                     </div>
 
@@ -427,9 +427,9 @@ const Settings = () => {
                         </div>
                         <ul className="text-xs text-muted-foreground space-y-1">
                           <li>• Envio automático de mensagens</li>
-                          <li>• Recepção de respostas do N8N</li>
+                          <li>• Recepção de respostas do webhook</li>
                           <li>• Processamento de linguagem natural</li>
-                          <li>• Integração com RAG</li>
+                          <li>• Integração com sistemas de IA</li>
                         </ul>
                       </div>
                       
