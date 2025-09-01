@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Shield, 
   Database, 
@@ -17,10 +20,45 @@ import {
   Settings as SettingsIcon,
   Cloud,
   Key,
-  FileText
+  FileText,
+  Link,
+  Zap,
+  Save
 } from "lucide-react";
 
+import { useState, useEffect } from "react";
+
 const Settings = () => {
+  const { toast } = useToast();
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const savedWebhook = localStorage.getItem('n8n_webhook_url');
+    if (savedWebhook) {
+      setWebhookUrl(savedWebhook);
+    }
+  }, []);
+
+  const saveWebhookConfig = async () => {
+    setIsSaving(true);
+    try {
+      // Aqui futuramente pode salvar no backend via Supabase
+      localStorage.setItem('n8n_webhook_url', webhookUrl);
+      toast({
+        title: "Configuração Salva",
+        description: "URL do webhook N8N foi salva com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao salvar a configuração do webhook.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
   const complianceItems = [
     {
       title: "Conformidade LGPD",
@@ -332,48 +370,89 @@ const Settings = () => {
 
           {/* Integrations Tab */}
           <TabsContent value="integrations">
-            <Card className="shadow-elegant">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Key className="h-5 w-5 text-primary" />
-                  <span>Integrações & APIs</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gradient-primary p-6 rounded-xl text-primary-foreground text-center">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-90" />
-                  <h3 className="text-xl font-semibold mb-2">
-                    Funcionalidades Avançadas Disponíveis
-                  </h3>
-                  <p className="opacity-90 mb-6">
-                    Para ativar integrações com Supabase, N8N, Google Calendar, WhatsApp e 
-                    outras APIs, conecte seu projeto ao Supabase usando nossa integração nativa.
-                  </p>
-                  
-                  <div className="grid md:grid-cols-2 gap-4 mb-6">
-                    <div className="bg-primary-foreground/10 p-4 rounded-lg">
-                      <h4 className="font-medium mb-2">Backend Completo</h4>
-                      <ul className="text-sm opacity-90 space-y-1">
-                        <li>• Autenticação segura</li>
-                        <li>• Banco de dados</li>
-                        <li>• Edge Functions</li>
-                        <li>• APIs REST</li>
-                      </ul>
+            <div className="grid lg:grid-cols-1 gap-6">
+              {/* N8N Chatbot Configuration */}
+              <Card className="shadow-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Zap className="h-5 w-5 text-primary" />
+                    <span>Configuração do Chatbot N8N</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="p-4 rounded-lg bg-accent/50 border border-border">
+                      <div className="flex items-start space-x-3">
+                        <Bot className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-foreground mb-1">Webhook do Chatbot</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Configure o endpoint do N8N que receberá as mensagens do chatbot e retornará as respostas.
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    
-                    <div className="bg-primary-foreground/10 p-4 rounded-lg">
-                      <h4 className="font-medium mb-2">Automação N8N</h4>
-                      <ul className="text-sm opacity-90 space-y-1">
-                        <li>• Fluxos inteligentes</li>
-                        <li>• Webhooks</li>
-                        <li>• RAG (Retrieval-Augmented Generation)</li>
-                        <li>• Google Calendar</li>
-                      </ul>
+
+                    <div className="space-y-3">
+                      <Label htmlFor="webhook-url" className="text-sm font-medium">
+                        URL do Webhook N8N
+                      </Label>
+                      <Input
+                        id="webhook-url"
+                        type="url"
+                        placeholder="https://seu-n8n-instance.com/webhook/chatbot"
+                        value={webhookUrl}
+                        onChange={(e) => setWebhookUrl(e.target.value)}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Esta URL será usada para enviar mensagens do chat e receber respostas automatizadas.
+                      </p>
+                    </div>
+
+                    <Button 
+                      onClick={saveWebhookConfig}
+                      disabled={!webhookUrl || isSaving}
+                      className="w-full"
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      {isSaving ? "Salvando..." : "Salvar Configuração"}
+                    </Button>
+
+                    <div className="grid md:grid-cols-2 gap-4 mt-6">
+                      <div className="p-3 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Link className="h-4 w-4 text-primary" />
+                          <h5 className="font-medium text-foreground text-sm">Funcionalidades</h5>
+                        </div>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          <li>• Envio automático de mensagens</li>
+                          <li>• Recepção de respostas do N8N</li>
+                          <li>• Processamento de linguagem natural</li>
+                          <li>• Integração com RAG</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="p-3 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <CheckCircle className="h-4 w-4 text-success" />
+                          <h5 className="font-medium text-foreground text-sm">Status da Integração</h5>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">Webhook:</span>
+                            <Badge variant={webhookUrl ? "secondary" : "outline"} 
+                                   className={webhookUrl ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
+                              {webhookUrl ? "Configurado" : "Pendente"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
